@@ -1,0 +1,57 @@
+{
+    "builders": [
+      {
+        "force_deregister": true,
+        "ssh_clear_authorized_keys": true,
+        "custom_endpoint_ec2": "https://api.ec2.us-east-1.aws",
+        "type": "amazon-ebs",
+        "region": "us-east-1",
+        "instance_type": "t3a.small",
+        "ssh_username": "ubuntu",
+        "ssh_interface": "private_ip",
+        "source_ami_filter": {
+          "filters": {
+            "virtualization-type": "hvm",
+            "name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-202*",
+            "root-device-type": "ebs"
+          },
+          "owners": [
+            "099720109477"
+          ],
+          "most_recent": true
+        },
+        "ami_name": "Mizu-BaseImage-{{user `branch`}}-{{isotime \"2006-01-02\"}}",
+        "ami_block_device_mappings": [
+          {
+            "device_name": "/dev/sda1",
+            "volume_size": 8,
+            "volume_type": "gp3",
+            "delete_on_termination": true
+          }
+        ],
+        "tags": {
+          "Name": "Mizu-BaseImage-{{user `branch`}}-{{isotime \"2006-01-02\"}}",
+          "env": "QA",
+          "responsible_individuals": "devops"
+        },
+        "run_tags": {
+          "Name": "packer-baseimage-{{user `branch`}}-{{isotime \"2006-01-02\"}}",
+          "responsible_individuals": "devops"
+        },
+        "vpc_id": "vpc-09f1e2d57a7d8edc0",
+        "subnet_id": "subnet-0025ad04a9f0860cf",
+        "security_group_ids": "sg-05dd4564ab0a5333d"
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "file",
+        "source": "/var/lib/jenkins/mizu_jenkins_github_key",
+        "destination": "/tmp/mizu_jenkins_github_key"
+      },
+      {
+        "type": "shell",
+        "script": "script.sh"
+      }
+    ]
+  }
